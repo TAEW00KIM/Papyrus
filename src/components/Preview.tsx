@@ -26,9 +26,27 @@ export function Preview({ markdown: md, theme = "default", scrollRatio }: Previe
   const [html, setHtml] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const isUserScrolling = useRef(false);
+  const userScrollTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
-    if (scrollRatio == null || !containerRef.current) return;
+    const el = containerRef.current;
+    if (!el) return;
+
+    const handleScroll = () => {
+      isUserScrolling.current = true;
+      clearTimeout(userScrollTimer.current);
+      userScrollTimer.current = setTimeout(() => {
+        isUserScrolling.current = false;
+      }, 1000);
+    };
+
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (scrollRatio == null || !containerRef.current || isUserScrolling.current) return;
     const el = containerRef.current;
     el.scrollTop = scrollRatio * (el.scrollHeight - el.clientHeight);
   }, [scrollRatio]);
