@@ -7,6 +7,8 @@ interface ToolbarProps {
   onExportPdf: () => void;
   currentTheme: string;
   onThemeChange: (theme: string) => void;
+  tocEnabled: boolean;
+  onTocToggle: () => void;
 }
 
 const THEMES = [
@@ -20,6 +22,8 @@ export function Toolbar({
   onExportPdf,
   currentTheme,
   onThemeChange,
+  tocEnabled,
+  onTocToggle,
 }: ToolbarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -68,6 +72,17 @@ export function Toolbar({
             </option>
           ))}
         </select>
+
+        <button
+          onClick={onTocToggle}
+          className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors ${
+            tocEnabled
+              ? "text-white bg-black"
+              : "text-gray-700 bg-gray-100 hover:bg-gray-200"
+          }`}
+        >
+          목차
+        </button>
 
         <button
           onClick={onExportPdf}

@@ -43,6 +43,7 @@ export default function Home() {
     return localStorage.getItem(STORAGE_KEY) || INITIAL_MD;
   });
   const [scrollRatio, setScrollRatio] = useState(0);
+  const [tocEnabled, setTocEnabled] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -76,12 +77,14 @@ export default function Home() {
     const { exportPdf } = await import("@/lib/pdf");
     const { renderMarkdown } = await import("@/lib/markdown");
     const { getThemeClassName } = await import("@/lib/themes");
+    const { extractToc, renderTocHtml } = await import("@/lib/toc");
     const html = await renderMarkdown(md);
     const themeClass = getThemeClassName(theme);
     const res = await fetch(`/themes/${theme}.css`);
     const themeCSS = await res.text();
-    exportPdf(`<div class="${themeClass}">${html}</div>`, { themeCSS });
-  }, [md, theme]);
+    const tocHtml = tocEnabled ? renderTocHtml(extractToc(md)) : "";
+    exportPdf(`<div class="${themeClass}">${html}</div>`, { themeCSS, tocHtml });
+  }, [md, theme, tocEnabled]);
 
   return (
     <main className="h-screen flex flex-col bg-white" onDrop={handleDrop} onDragOver={handleDragOver}>
@@ -90,6 +93,8 @@ export default function Home() {
         onExportPdf={handleExportPdf}
         currentTheme={theme}
         onThemeChange={setTheme}
+        tocEnabled={tocEnabled}
+        onTocToggle={() => setTocEnabled((v) => !v)}
       />
       <div className="flex-1 flex min-h-0">
         <div className="w-1/2 min-h-0">

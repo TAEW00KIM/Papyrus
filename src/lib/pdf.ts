@@ -1,6 +1,7 @@
 interface PdfOptions {
   title?: string;
   themeCSS?: string;
+  tocHtml?: string;
 }
 
 export function exportPdf(html: string, options: PdfOptions = {}) {
@@ -59,7 +60,7 @@ export function exportPdf(html: string, options: PdfOptions = {}) {
       <style>${themeCSS}</style>
     </head>
     <body>
-      <div class="content">${html}</div>
+      <div class="content">${options.tocHtml || ""}${html}</div>
     </body>
     </html>
   `);
