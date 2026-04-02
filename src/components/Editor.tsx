@@ -14,7 +14,7 @@ export function Editor({ initialValue, onChange, onScroll }: EditorProps) {
   return (
     <div
       ref={containerRef}
-      className="h-full overflow-auto border-r border-gray-200"
+      className="h-full overflow-auto bg-white"
     />
   );
 }

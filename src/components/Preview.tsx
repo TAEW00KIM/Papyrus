@@ -46,7 +46,7 @@ export function Preview({ markdown: md, theme = "default", scrollRatio }: Previe
   }, [cleaned]);
 
   return (
-    <div ref={containerRef} className="h-full overflow-auto p-8">
+    <div ref={containerRef} className="h-full overflow-auto px-10 py-8">
       <div className={`prose prose-neutral max-w-none ${getThemeClassName(theme)}`}>
         {html.split(/(<div data-mermaid-id="__MERMAID_\d+__"><\/div>)/).map((part, i) => {
           const match = part.match(/data-mermaid-id="(__MERMAID_\d+__)"/);

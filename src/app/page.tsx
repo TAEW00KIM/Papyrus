@@ -87,7 +87,7 @@ export default function Home() {
   }, [md, theme, tocEnabled]);
 
   return (
-    <main className="h-screen flex flex-col bg-white" onDrop={handleDrop} onDragOver={handleDragOver}>
+    <main className="h-screen flex flex-col bg-gray-50" onDrop={handleDrop} onDragOver={handleDragOver}>
       <Toolbar
         onFileUpload={handleFileUpload}
         onExportPdf={handleExportPdf}
@@ -105,7 +105,8 @@ export default function Home() {
             onScroll={setScrollRatio}
           />
         </div>
-        <div className="w-1/2 min-h-0 border-l border-gray-200">
+        <div className="w-px bg-gray-100 shrink-0" />
+        <div className="w-1/2 min-h-0 bg-white">
           <Preview markdown={md} theme={theme} scrollRatio={scrollRatio} />
         </div>
       </div>

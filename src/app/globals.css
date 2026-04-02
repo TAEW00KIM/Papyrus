@@ -1,2 +1,51 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+* {
+  word-break: keep-all;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background-color: #e5e5e5;
+  color: #000;
+}
+
+/* CodeMirror overrides for Toss style */
+.cm-editor {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  height: 100%;
+}
+
+.cm-editor .cm-scroller {
+  padding: 24px;
+  line-height: 1.7;
+}
+
+.cm-editor .cm-gutters {
+  background: #fafafa;
+  border-right: 1px solid #f0f0f0;
+  color: #c0c0c0;
+  font-size: 12px;
+}
+
+.cm-editor .cm-activeLineGutter {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.cm-editor .cm-activeLine {
+  background: #fafafa;
+}
+
+.cm-editor .cm-cursor {
+  border-left-color: #000;
+}
+
+.cm-editor.cm-focused {
+  outline: none;
+}
