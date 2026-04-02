@@ -1,0 +1,28 @@
+.theme-minimal {
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #333;
+}
+
+.theme-minimal h1 { font-size: 1.6em; font-weight: 800; letter-spacing: -0.02em; color: #000; margin-top: 2em; margin-bottom: 0.5em; }
+.theme-minimal h2 { font-size: 1.3em; font-weight: 700; color: #000; margin-top: 2em; margin-bottom: 0.5em; }
+.theme-minimal h3 { font-size: 1.1em; font-weight: 600; color: #000; margin-top: 2em; margin-bottom: 0.5em; }
+
+.theme-minimal a { color: #000; text-decoration: none; border-bottom: 1px solid #ccc; }
+.theme-minimal a:hover { border-bottom-color: #000; }
+.theme-minimal code {
+  font-family: 'SF Mono', 'Menlo', monospace;
+  background: #fafafa;
+  padding: 0.15em 0.35em;
+  border-radius: 3px;
+  font-size: 0.88em;
+}
+.theme-minimal pre { background: #fafafa; border-radius: 6px; padding: 1em; overflow-x: auto; }
+.theme-minimal pre code { background: none; padding: 0; }
+.theme-minimal blockquote { border-left: 2px solid #ddd; margin-left: 0; padding-left: 1em; color: #666; }
+.theme-minimal table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+.theme-minimal th, .theme-minimal td { border-bottom: 1px solid #eee; padding: 8px 12px; }
+.theme-minimal th { font-weight: 600; text-align: left; }
+.theme-minimal img { max-width: 100%; border-radius: 4px; }
+.theme-minimal hr { border: none; border-top: 1px solid #eee; margin: 2em 0; }

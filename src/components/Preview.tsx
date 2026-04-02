@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { renderMarkdown } from "@/lib/markdown";
 import { MermaidRenderer } from "./MermaidRenderer";
+import { getThemeClassName } from "@/lib/themes";
 
 interface PreviewProps {
   markdown: string;
@@ -39,7 +40,7 @@ export function Preview({ markdown: md, theme = "default" }: PreviewProps) {
 
   return (
     <div ref={containerRef} className="h-full overflow-auto p-8">
-      <div className="prose prose-neutral max-w-none">
+      <div className={`prose prose-neutral max-w-none ${getThemeClassName(theme)}`}>
         {html.split(/(<div data-mermaid-id="__MERMAID_\d+__"><\/div>)/).map((part, i) => {
           const match = part.match(/data-mermaid-id="(__MERMAID_\d+__)"/);
           if (match && mermaidBlocks.has(match[1])) {
