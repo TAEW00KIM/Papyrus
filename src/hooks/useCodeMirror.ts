@@ -11,13 +11,16 @@ import { searchKeymap } from "@codemirror/search";
 interface UseCodeMirrorProps {
   initialValue: string;
   onChange: (value: string) => void;
+  onScroll?: (ratio: number) => void;
 }
 
-export function useCodeMirror({ initialValue, onChange }: UseCodeMirrorProps) {
+export function useCodeMirror({ initialValue, onChange, onScroll }: UseCodeMirrorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
+  const onScrollRef = useRef(onScroll);
+  onScrollRef.current = onScroll;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -48,7 +51,15 @@ export function useCodeMirror({ initialValue, onChange }: UseCodeMirrorProps) {
 
     viewRef.current = view;
 
+    const scrollHandler = () => {
+      const dom = view.scrollDOM;
+      const ratio = dom.scrollTop / (dom.scrollHeight - dom.clientHeight || 1);
+      onScrollRef.current?.(ratio);
+    };
+    view.scrollDOM.addEventListener("scroll", scrollHandler);
+
     return () => {
+      view.scrollDOM.removeEventListener("scroll", scrollHandler);
       view.destroy();
     };
   }, [initialValue]);

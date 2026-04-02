@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Editor } from "@/components/Editor";
 import { Preview } from "@/components/Preview";
 import { Toolbar } from "@/components/Toolbar";
@@ -34,6 +34,7 @@ export default function Home() {
   const [theme, setTheme] = useState("default");
   const [fileLoadKey, setFileLoadKey] = useState(0);
   const [loadedContent, setLoadedContent] = useState(INITIAL_MD);
+  const [scrollRatio, setScrollRatio] = useState(0);
 
   const handleFileUpload = useCallback((content: string) => {
     setMd(content);
@@ -66,10 +67,11 @@ export default function Home() {
             key={fileLoadKey}
             initialValue={loadedContent}
             onChange={setMd}
+            onScroll={setScrollRatio}
           />
         </div>
         <div className="w-1/2 min-h-0 border-l border-gray-200">
-          <Preview markdown={md} theme={theme} />
+          <Preview markdown={md} theme={theme} scrollRatio={scrollRatio} />
         </div>
       </div>
       <StatusBar markdown={md} />

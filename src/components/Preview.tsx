@@ -8,6 +8,7 @@ import { getThemeClassName } from "@/lib/themes";
 interface PreviewProps {
   markdown: string;
   theme?: string;
+  scrollRatio?: number;
 }
 
 function extractMermaidBlocks(md: string): { cleaned: string; blocks: Map<string, string> } {
@@ -21,10 +22,16 @@ function extractMermaidBlocks(md: string): { cleaned: string; blocks: Map<string
   return { cleaned, blocks };
 }
 
-export function Preview({ markdown: md, theme = "default" }: PreviewProps) {
+export function Preview({ markdown: md, theme = "default", scrollRatio }: PreviewProps) {
   const [html, setHtml] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => {
+    if (scrollRatio == null || !containerRef.current) return;
+    const el = containerRef.current;
+    el.scrollTop = scrollRatio * (el.scrollHeight - el.clientHeight);
+  }, [scrollRatio]);
 
   const { cleaned, blocks: mermaidBlocks } = useMemo(() => extractMermaidBlocks(md), [md]);
 
