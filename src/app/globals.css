@@ -7,45 +7,95 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
 ::selection {
-  background-color: #e5e5e5;
+  background-color: rgba(0, 0, 0, 0.08);
   color: #000;
 }
 
-/* CodeMirror overrides for Toss style */
+/* Scrollbar — thin & subtle */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* CodeMirror — refined editor */
 .cm-editor {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
+  font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+  font-size: 13.5px;
   height: 100%;
+  letter-spacing: -0.01em;
 }
 
 .cm-editor .cm-scroller {
-  padding: 24px;
-  line-height: 1.7;
+  padding: 20px 24px;
+  line-height: 1.75;
 }
 
 .cm-editor .cm-gutters {
-  background: #fafafa;
-  border-right: 1px solid #f0f0f0;
-  color: #c0c0c0;
-  font-size: 12px;
+  background: transparent;
+  border-right: none;
+  color: rgba(0, 0, 0, 0.15);
+  font-size: 11px;
+  padding-right: 8px;
+  min-width: 40px;
 }
 
 .cm-editor .cm-activeLineGutter {
-  background: #f0f0f0;
-  color: #666;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.35);
 }
 
 .cm-editor .cm-activeLine {
-  background: #fafafa;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 2px;
 }
 
 .cm-editor .cm-cursor {
   border-left-color: #000;
+  border-left-width: 1.5px;
 }
 
 .cm-editor.cm-focused {
   outline: none;
+}
+
+.cm-editor .cm-selectionBackground {
+  background: rgba(0, 0, 0, 0.07) !important;
+}
+
+.cm-editor.cm-focused .cm-selectionBackground {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Preview prose refinements */
+.prose {
+  --tw-prose-body: #333;
+  --tw-prose-headings: #111;
+  --tw-prose-links: #000;
+  --tw-prose-code: #1a1a1a;
+}
+
+.prose :where(h1, h2, h3):first-child {
+  margin-top: 0;
 }

@@ -32,16 +32,21 @@ function hello() {
 `;
 
 export default function Home() {
-  const [md, setMd] = useState(() => {
-    if (typeof window === "undefined") return INITIAL_MD;
-    return localStorage.getItem(STORAGE_KEY) || INITIAL_MD;
-  });
+  const [md, setMd] = useState(INITIAL_MD);
   const [theme, setTheme] = useState("default");
   const [fileLoadKey, setFileLoadKey] = useState(0);
-  const [loadedContent, setLoadedContent] = useState(() => {
-    if (typeof window === "undefined") return INITIAL_MD;
-    return localStorage.getItem(STORAGE_KEY) || INITIAL_MD;
-  });
+  const [loadedContent, setLoadedContent] = useState(INITIAL_MD);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      setMd(saved);
+      setLoadedContent(saved);
+      setFileLoadKey((k) => k + 1);
+    }
+    setHydrated(true);
+  }, []);
   const [scrollRatio, setScrollRatio] = useState(0);
   const [tocEnabled, setTocEnabled] = useState(false);
 
@@ -87,7 +92,7 @@ export default function Home() {
   }, [md, theme, tocEnabled]);
 
   return (
-    <main className="h-screen flex flex-col bg-gray-50" onDrop={handleDrop} onDragOver={handleDragOver}>
+    <main className="h-screen flex flex-col bg-white" onDrop={handleDrop} onDragOver={handleDragOver}>
       <Toolbar
         onFileUpload={handleFileUpload}
         onExportPdf={handleExportPdf}
@@ -97,7 +102,7 @@ export default function Home() {
         onTocToggle={() => setTocEnabled((v) => !v)}
       />
       <div className="flex-1 flex min-h-0">
-        <div className="w-1/2 min-h-0">
+        <div className="w-1/2 min-h-0 bg-white">
           <Editor
             key={fileLoadKey}
             initialValue={loadedContent}
@@ -105,8 +110,8 @@ export default function Home() {
             onScroll={setScrollRatio}
           />
         </div>
-        <div className="w-px bg-gray-100 shrink-0" />
-        <div className="w-1/2 min-h-0 bg-white">
+        <div className="w-px bg-black/[0.06] shrink-0" />
+        <div className="w-1/2 min-h-0 bg-gray-50/50">
           <Preview markdown={md} theme={theme} scrollRatio={scrollRatio} />
         </div>
       </div>
