@@ -29,4 +29,10 @@ describe("renderMarkdown", () => {
     const html = await renderMarkdown("- [x] done\n- [ ] todo");
     expect(html).toContain('type="checkbox"');
   });
+
+  it("renders code blocks with syntax highlighting", async () => {
+    const md = '```javascript\nconst x = 1;\n```';
+    const html = await renderMarkdown(md);
+    expect(html).toContain("shiki");
+  });
 });
