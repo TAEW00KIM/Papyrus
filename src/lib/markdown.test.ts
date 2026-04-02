@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { renderMarkdown } from "./markdown";
+import { extractToc } from "./toc";
 
 describe("renderMarkdown", () => {
   it("renders headings", async () => {
@@ -34,5 +35,15 @@ describe("renderMarkdown", () => {
     const md = '```javascript\nconst x = 1;\n```';
     const html = await renderMarkdown(md);
     expect(html).toContain("shiki");
+  });
+});
+
+describe("extractToc", () => {
+  it("extracts headings with levels", () => {
+    const md = "# Title\n## Section\n### Sub";
+    const toc = extractToc(md);
+    expect(toc).toHaveLength(3);
+    expect(toc[0]).toEqual({ level: 1, text: "Title", id: "title" });
+    expect(toc[1]).toEqual({ level: 2, text: "Section", id: "section" });
   });
 });
