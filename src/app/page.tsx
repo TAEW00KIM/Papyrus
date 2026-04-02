@@ -6,6 +6,8 @@ import { Preview } from "@/components/Preview";
 import { Toolbar } from "@/components/Toolbar";
 import { StatusBar } from "@/components/StatusBar";
 
+const STORAGE_KEY = "papyrus-content";
+
 const INITIAL_MD = `# Hello Papyrus
 
 This is a **markdown** editor with live preview.
@@ -30,16 +32,44 @@ function hello() {
 `;
 
 export default function Home() {
-  const [md, setMd] = useState(INITIAL_MD);
+  const [md, setMd] = useState(() => {
+    if (typeof window === "undefined") return INITIAL_MD;
+    return localStorage.getItem(STORAGE_KEY) || INITIAL_MD;
+  });
   const [theme, setTheme] = useState("default");
   const [fileLoadKey, setFileLoadKey] = useState(0);
-  const [loadedContent, setLoadedContent] = useState(INITIAL_MD);
+  const [loadedContent, setLoadedContent] = useState(() => {
+    if (typeof window === "undefined") return INITIAL_MD;
+    return localStorage.getItem(STORAGE_KEY) || INITIAL_MD;
+  });
   const [scrollRatio, setScrollRatio] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      localStorage.setItem(STORAGE_KEY, md);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [md]);
 
   const handleFileUpload = useCallback((content: string) => {
     setMd(content);
     setLoadedContent(content);
     setFileLoadKey((k) => k + 1);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (!file || !file.name.match(/\.(md|markdown|txt)$/)) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      handleFileUpload(reader.result as string);
+    };
+    reader.readAsText(file);
+  }, [handleFileUpload]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
   }, []);
 
   const handleExportPdf = useCallback(async () => {
@@ -54,7 +84,7 @@ export default function Home() {
   }, [md, theme]);
 
   return (
-    <main className="h-screen flex flex-col bg-white">
+    <main className="h-screen flex flex-col bg-white" onDrop={handleDrop} onDragOver={handleDragOver}>
       <Toolbar
         onFileUpload={handleFileUpload}
         onExportPdf={handleExportPdf}
