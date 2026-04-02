@@ -41,9 +41,16 @@ export default function Home() {
     setFileLoadKey((k) => k + 1);
   }, []);
 
-  const handleExportPdf = useCallback(() => {
-    // Task 8에서 구현
-  }, []);
+  const handleExportPdf = useCallback(async () => {
+    const { exportPdf } = await import("@/lib/pdf");
+    const { renderMarkdown } = await import("@/lib/markdown");
+    const { getThemeClassName } = await import("@/lib/themes");
+    const html = await renderMarkdown(md);
+    const themeClass = getThemeClassName(theme);
+    const res = await fetch(`/themes/${theme}.css`);
+    const themeCSS = await res.text();
+    exportPdf(`<div class="${themeClass}">${html}</div>`, { themeCSS });
+  }, [md, theme]);
 
   return (
     <main className="h-screen flex flex-col bg-white">
