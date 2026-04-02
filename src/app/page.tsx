@@ -5,8 +5,10 @@ import { Editor } from "@/components/Editor";
 import { Preview } from "@/components/Preview";
 import { Toolbar } from "@/components/Toolbar";
 import { StatusBar } from "@/components/StatusBar";
+import { CustomCSSEditor } from "@/components/CustomCSSEditor";
 
 const STORAGE_KEY = "papyrus-content";
+const CUSTOM_CSS_KEY = "papyrus-custom-css";
 
 const INITIAL_MD = `# Hello Papyrus
 
@@ -36,8 +38,12 @@ export default function Home() {
   const [theme, setTheme] = useState("default");
   const [fileLoadKey, setFileLoadKey] = useState(0);
   const [loadedContent, setLoadedContent] = useState(INITIAL_MD);
-  const [hydrated, setHydrated] = useState(false);
+  const [scrollRatio, setScrollRatio] = useState(0);
+  const [tocEnabled, setTocEnabled] = useState(false);
+  const [customCSS, setCustomCSS] = useState("");
+  const [cssEditorOpen, setCssEditorOpen] = useState(false);
 
+  // Hydrate from localStorage
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -45,17 +51,29 @@ export default function Home() {
       setLoadedContent(saved);
       setFileLoadKey((k) => k + 1);
     }
-    setHydrated(true);
+    const savedCSS = localStorage.getItem(CUSTOM_CSS_KEY);
+    if (savedCSS) setCustomCSS(savedCSS);
   }, []);
-  const [scrollRatio, setScrollRatio] = useState(0);
-  const [tocEnabled, setTocEnabled] = useState(false);
 
+  // Auto-save content
   useEffect(() => {
     const timer = setTimeout(() => {
       localStorage.setItem(STORAGE_KEY, md);
     }, 1000);
     return () => clearTimeout(timer);
   }, [md]);
+
+  // Inject custom CSS into <head> as a <style> tag
+  useEffect(() => {
+    const id = "papyrus-custom-theme";
+    let el = document.getElementById(id) as HTMLStyleElement | null;
+    if (!el) {
+      el = document.createElement("style");
+      el.id = id;
+      document.head.appendChild(el);
+    }
+    el.textContent = customCSS;
+  }, [customCSS]);
 
   const handleFileUpload = useCallback((content: string) => {
     setMd(content);
@@ -78,6 +96,13 @@ export default function Home() {
     e.preventDefault();
   }, []);
 
+  const handleThemeChange = useCallback((newTheme: string) => {
+    setTheme(newTheme);
+    if (newTheme === "custom") {
+      setCssEditorOpen(true);
+    }
+  }, []);
+
   const handleExportPdf = useCallback(async () => {
     const { exportPdf } = await import("@/lib/pdf");
     const { renderMarkdown } = await import("@/lib/markdown");
@@ -85,11 +110,22 @@ export default function Home() {
     const { extractToc, renderTocHtml } = await import("@/lib/toc");
     const html = await renderMarkdown(md);
     const themeClass = getThemeClassName(theme);
-    const res = await fetch(`/themes/${theme}.css`);
-    const themeCSS = await res.text();
+
+    let themeCSS = "";
+    if (theme === "custom") {
+      themeCSS = customCSS;
+    } else {
+      try {
+        const res = await fetch(`/themes/${theme}.css`);
+        themeCSS = await res.text();
+      } catch {
+        // fallback: no theme CSS
+      }
+    }
+
     const tocHtml = tocEnabled ? renderTocHtml(extractToc(md)) : "";
     exportPdf(`<div class="${themeClass}">${html}</div>`, { themeCSS, tocHtml });
-  }, [md, theme, tocEnabled]);
+  }, [md, theme, tocEnabled, customCSS]);
 
   return (
     <main className="h-screen flex flex-col bg-white" onDrop={handleDrop} onDragOver={handleDragOver}>
@@ -97,7 +133,7 @@ export default function Home() {
         onFileUpload={handleFileUpload}
         onExportPdf={handleExportPdf}
         currentTheme={theme}
-        onThemeChange={setTheme}
+        onThemeChange={handleThemeChange}
         tocEnabled={tocEnabled}
         onTocToggle={() => setTocEnabled((v) => !v)}
       />
@@ -116,6 +152,12 @@ export default function Home() {
         </div>
       </div>
       <StatusBar markdown={md} />
+      <CustomCSSEditor
+        open={cssEditorOpen}
+        onClose={() => setCssEditorOpen(false)}
+        value={customCSS}
+        onChange={setCustomCSS}
+      />
     </main>
   );
 }

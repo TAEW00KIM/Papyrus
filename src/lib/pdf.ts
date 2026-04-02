@@ -33,14 +33,21 @@ export function exportPdf(html: string, options: PdfOptions = {}) {
         }
         body {
           font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-          line-height: 1.75;
+          font-size: 11pt;
+          line-height: 1.7;
           color: #222;
           padding: 0;
           margin: 0;
         }
+        h1 { font-size: 1.6em; }
+        h2 { font-size: 1.3em; }
+        h3 { font-size: 1.15em; }
+        h4, h5, h6 { font-size: 1em; }
         h1, h2, h3, h4, h5, h6 {
           color: #111;
           break-after: avoid;
+          margin-top: 1.2em;
+          margin-bottom: 0.4em;
         }
         pre, code, table, figure, img {
           break-inside: avoid;

@@ -15,6 +15,7 @@ const THEMES = [
   { id: "default", label: "Default" },
   { id: "academic", label: "Academic" },
   { id: "minimal", label: "Minimal" },
+  { id: "custom", label: "Custom CSS" },
 ];
 
 export function Toolbar({
