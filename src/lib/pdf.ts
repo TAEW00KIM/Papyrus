@@ -4,6 +4,15 @@ interface PdfOptions {
   tocHtml?: string;
 }
 
+function insertTocAfterH1(html: string, tocHtml: string): string {
+  if (!tocHtml) return html;
+  // Insert TOC after the first closing </h1> (or its wrapping </a></h1>)
+  const h1End = html.search(/<\/h1>/i);
+  if (h1End === -1) return tocHtml + html;
+  const insertPos = h1End + "</h1>".length;
+  return html.slice(0, insertPos) + tocHtml + html.slice(insertPos);
+}
+
 export function exportPdf(html: string, options: PdfOptions = {}) {
   const { title = "Papyrus Document", themeCSS = "" } = options;
 
@@ -252,6 +261,40 @@ export function exportPdf(html: string, options: PdfOptions = {}) {
           break-before: avoid;
         }
 
+        /* ── TOC ── */
+        .toc {
+          margin: 1.2em 0 2em 0;
+          padding: 1em 1.2em;
+          background: #f8f9fa;
+          border-radius: 8px;
+          font-size: 0.85em;
+          break-inside: avoid;
+        }
+
+        .toc h2 {
+          font-size: 1em;
+          margin: 0 0 0.5em 0;
+          color: #555;
+          font-weight: 600;
+        }
+
+        .toc ul {
+          list-style: none;
+          padding-left: 0;
+          margin: 0;
+        }
+
+        .toc li {
+          margin-bottom: 0.15em;
+          line-height: 1.6;
+          color: #555;
+        }
+
+        .toc a {
+          color: #555;
+          text-decoration: none;
+        }
+
         /* ── Print cleanup ── */
         @media print {
           body { color: #2c3e50; }
@@ -260,7 +303,7 @@ export function exportPdf(html: string, options: PdfOptions = {}) {
       <style>${themeCSS}</style>
     </head>
     <body>
-      <div class="content">${options.tocHtml || ""}${html}</div>
+      <div class="content">${insertTocAfterH1(html, options.tocHtml || "")}</div>
     </body>
     </html>
   `);
