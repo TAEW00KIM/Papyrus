@@ -17,11 +17,11 @@
   margin-bottom: 0.5em;
 }
 
-.theme-default h1 { font-size: 2em; border-bottom: 1px solid #e5e5e5; padding-bottom: 0.3em; }
-.theme-default h2 { font-size: 1.5em; border-bottom: 1px solid #e5e5e5; padding-bottom: 0.3em; }
+.theme-default h1 { font-size: 2em; }
+.theme-default h2 { font-size: 1.5em; }
 .theme-default h3 { font-size: 1.25em; }
 
-.theme-default a { color: #000; text-decoration: underline; }
+.theme-default a { color: #000; text-decoration: none; }
 
 .theme-default code {
   font-family: 'JetBrains Mono', monospace;
