@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Link from "next/link";
 
 interface ToolbarProps {
   onFileUpload: (content: string) => void;
@@ -48,14 +49,14 @@ export function Toolbar({
 
   return (
     <header className="flex items-center justify-between h-[52px] px-5 bg-white/90 backdrop-blur-xl border-b border-black/[0.04] sticky top-0 z-40">
-      <div className="flex items-center gap-2.5">
+      <Link href="/" className="flex items-center gap-2.5 hover:opacity-70 transition-opacity duration-200">
         <h1 className="text-[15px] font-bold tracking-[-0.02em] text-gray-900">
           Papyrus
         </h1>
         <span className="text-[10px] font-semibold text-gray-400 bg-gray-100/80 px-1.5 py-[1px] rounded-[5px] uppercase tracking-wide">
           beta
         </span>
-      </div>
+      </Link>
 
       <nav className="flex items-center gap-1.5">
         <input
