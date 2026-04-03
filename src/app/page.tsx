@@ -63,7 +63,7 @@ export default function LandingPage() {
         </div>
       </div>
       <p className="absolute bottom-4 text-[10px] text-gray-200 select-none">
-        co-op 권현재
+        co-op hyeonjerry
       </p>
     </main>
   );
