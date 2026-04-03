@@ -60,12 +60,14 @@ export default function ViewPage() {
   const [error, setError] = useState<string | null>(null);
   const [supported, setSupported] = useState(true);
   const [theme, setTheme] = useState("default");
+  const [savedName, setSavedName] = useState<string | null>(null);
   const [restoring, setRestoring] = useState(true);
   const handleRef = useRef<FileSystemFileHandle | null>(null);
+  const savedHandleRef = useRef<FileSystemFileHandle | null>(null);
   const lastModifiedRef = useRef(0);
   const errorCountRef = useRef(0);
 
-  // Check browser support + restore saved handle
+  // Check browser support + check for saved handle
   useEffect(() => {
     if (typeof window.showOpenFilePicker !== "function") {
       setSupported(false);
@@ -77,19 +79,11 @@ export default function ViewPage() {
       try {
         const saved = await loadHandle();
         if (saved) {
-          const perm = await saved.requestPermission({ mode: "read" });
-          if (perm === "granted") {
-            handleRef.current = saved;
-            errorCountRef.current = 0;
-            setFileName(saved.name);
-            const file = await saved.getFile();
-            lastModifiedRef.current = file.lastModified;
-            setMarkdown(await file.text());
-            setWatching(true);
-          }
+          savedHandleRef.current = saved;
+          setSavedName(saved.name);
         }
       } catch {
-        // permission denied or handle invalid
+        // handle invalid
       }
       setRestoring(false);
     })();
@@ -121,6 +115,22 @@ export default function ViewPage() {
       await startWatching(fileHandle);
     } catch {
       // user cancelled picker
+    }
+  }, [startWatching]);
+
+  const handleRestore = useCallback(async () => {
+    const saved = savedHandleRef.current;
+    if (!saved) return;
+    try {
+      const perm = await saved.requestPermission({ mode: "read" });
+      if (perm === "granted") {
+        await startWatching(saved);
+      }
+    } catch {
+      setError("파일 접근 권한이 거부되었습니다.");
+      setSavedName(null);
+      savedHandleRef.current = null;
+      clearHandle();
     }
   }, [startWatching]);
 
@@ -208,17 +218,32 @@ export default function ViewPage() {
             </p>
           )}
 
+          {savedName && (
+            <button
+              onClick={handleRestore}
+              className="w-full px-4 py-3 text-[14px] font-semibold rounded-xl text-white bg-gray-900
+                shadow-[0_1px_2px_rgba(0,0,0,0.1)]
+                hover:bg-gray-800 hover:shadow-[0_2px_8px_rgba(0,0,0,0.12)]
+                active:scale-[0.98]
+                transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]"
+            >
+              {savedName} 다시 열기
+            </button>
+          )}
+
           <button
             onClick={handlePickFile}
             disabled={!supported}
-            className="w-full px-4 py-3 text-[14px] font-semibold rounded-xl text-white bg-gray-900
-              shadow-[0_1px_2px_rgba(0,0,0,0.1)]
-              hover:bg-gray-800 hover:shadow-[0_2px_8px_rgba(0,0,0,0.12)]
+            className={`w-full px-4 py-3 text-[14px] font-semibold rounded-xl
               active:scale-[0.98]
               disabled:opacity-40 disabled:pointer-events-none
-              transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]
+              ${savedName
+                ? "text-gray-600 bg-gray-100 hover:bg-gray-200"
+                : "text-white bg-gray-900 shadow-[0_1px_2px_rgba(0,0,0,0.1)] hover:bg-gray-800 hover:shadow-[0_2px_8px_rgba(0,0,0,0.12)]"
+              }`}
           >
-            파일 선택
+            {savedName ? "다른 파일 선택" : "파일 선택"}
           </button>
 
           <Link
