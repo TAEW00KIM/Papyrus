@@ -10,6 +10,47 @@ declare global {
       types?: { description: string; accept: Record<string, string[]> }[];
     }): Promise<FileSystemFileHandle[]>;
   }
+  interface FileSystemFileHandle {
+    requestPermission(options?: { mode: string }): Promise<string>;
+  }
+}
+
+const DB_NAME = "papyrus-view";
+const STORE_NAME = "file-handle";
+const KEY = "last";
+
+function openDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(STORE_NAME);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function saveHandle(handle: FileSystemFileHandle) {
+  const db = await openDB();
+  const tx = db.transaction(STORE_NAME, "readwrite");
+  tx.objectStore(STORE_NAME).put(handle, KEY);
+  db.close();
+}
+
+async function loadHandle(): Promise<FileSystemFileHandle | null> {
+  const db = await openDB();
+  return new Promise((resolve) => {
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const req = tx.objectStore(STORE_NAME).get(KEY);
+    req.onsuccess = () => resolve(req.result ?? null);
+    req.onerror = () => resolve(null);
+    db.close();
+  });
+}
+
+async function clearHandle() {
+  const db = await openDB();
+  const tx = db.transaction(STORE_NAME, "readwrite");
+  tx.objectStore(STORE_NAME).delete(KEY);
+  db.close();
 }
 
 export default function ViewPage() {
@@ -19,15 +60,52 @@ export default function ViewPage() {
   const [error, setError] = useState<string | null>(null);
   const [supported, setSupported] = useState(true);
   const [theme, setTheme] = useState("default");
+  const [restoring, setRestoring] = useState(true);
   const handleRef = useRef<FileSystemFileHandle | null>(null);
   const lastModifiedRef = useRef(0);
   const errorCountRef = useRef(0);
 
-  // Check browser support
+  // Check browser support + restore saved handle
   useEffect(() => {
     if (typeof window.showOpenFilePicker !== "function") {
       setSupported(false);
+      setRestoring(false);
+      return;
     }
+
+    (async () => {
+      try {
+        const saved = await loadHandle();
+        if (saved) {
+          const perm = await saved.requestPermission({ mode: "read" });
+          if (perm === "granted") {
+            handleRef.current = saved;
+            errorCountRef.current = 0;
+            setFileName(saved.name);
+            const file = await saved.getFile();
+            lastModifiedRef.current = file.lastModified;
+            setMarkdown(await file.text());
+            setWatching(true);
+          }
+        }
+      } catch {
+        // permission denied or handle invalid
+      }
+      setRestoring(false);
+    })();
+  }, []);
+
+  const startWatching = useCallback(async (fileHandle: FileSystemFileHandle) => {
+    handleRef.current = fileHandle;
+    errorCountRef.current = 0;
+    setFileName(fileHandle.name);
+    setError(null);
+    await saveHandle(fileHandle);
+
+    const file = await fileHandle.getFile();
+    lastModifiedRef.current = file.lastModified;
+    setMarkdown(await file.text());
+    setWatching(true);
   }, []);
 
   const handlePickFile = useCallback(async () => {
@@ -40,20 +118,11 @@ export default function ViewPage() {
           },
         ],
       });
-
-      handleRef.current = fileHandle;
-      errorCountRef.current = 0;
-      setFileName(fileHandle.name);
-      setError(null);
-
-      const file = await fileHandle.getFile();
-      lastModifiedRef.current = file.lastModified;
-      setMarkdown(await file.text());
-      setWatching(true);
+      await startWatching(fileHandle);
     } catch {
       // user cancelled picker
     }
-  }, []);
+  }, [startWatching]);
 
   const handleStop = useCallback(() => {
     setWatching(false);
@@ -62,6 +131,7 @@ export default function ViewPage() {
     handleRef.current = null;
     lastModifiedRef.current = 0;
     errorCountRef.current = 0;
+    clearHandle();
   }, []);
 
   // Poll file for changes (setTimeout chain to avoid race conditions)
@@ -88,6 +158,7 @@ export default function ViewPage() {
           setError("파일에 접근할 수 없습니다. 파일이 삭제되었거나 이동되었을 수 있습니다.");
           setWatching(false);
           setMarkdown(null);
+          clearHandle();
           return;
         }
       }
@@ -98,6 +169,15 @@ export default function ViewPage() {
     poll();
     return () => { cancelled = true; };
   }, [watching]);
+
+  // Loading state while restoring
+  if (restoring) {
+    return (
+      <main className="h-screen flex items-center justify-center bg-white">
+        <p className="text-[13px] text-gray-300">불러오는 중...</p>
+      </main>
+    );
+  }
 
   // File picker phase
   if (!watching && markdown === null) {
