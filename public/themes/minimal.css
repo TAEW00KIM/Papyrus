@@ -18,7 +18,7 @@
   border-radius: 3px;
   font-size: 0.88em;
 }
-.theme-minimal pre { background: #fafafa; border-radius: 6px; padding: 1em; overflow-x: auto; }
+.theme-minimal pre { background: #fafafa; color: #1a1a1a; border-radius: 6px; padding: 1em; overflow-x: auto; }
 .theme-minimal pre code { background: none; padding: 0; }
 .theme-minimal blockquote { border-left: 2px solid #ddd; margin-left: 0; padding-left: 1em; color: #666; }
 .theme-minimal table { border-collapse: collapse; width: 100%; margin: 1em 0; }

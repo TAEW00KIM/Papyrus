@@ -19,7 +19,7 @@
   border-radius: 3px;
   font-size: 0.85em;
 }
-.theme-academic pre { background: #f8f8f8; border: 1px solid #ccc; border-radius: 4px; padding: 0.8em; overflow-x: auto; }
+.theme-academic pre { background: #f8f8f8; color: #1a1a1a; border: 1px solid #ccc; border-radius: 4px; padding: 0.8em; overflow-x: auto; }
 .theme-academic pre code { background: none; padding: 0; }
 .theme-academic blockquote { border-left: 3px solid #ccc; margin-left: 0; padding-left: 1em; font-style: italic; color: #444; }
 .theme-academic table { border-collapse: collapse; width: 100%; margin: 1em 0; }

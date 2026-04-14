@@ -94,6 +94,8 @@ body {
   --tw-prose-headings: #111;
   --tw-prose-links: #000;
   --tw-prose-code: #1a1a1a;
+  --tw-prose-pre-code: #1a1a1a;
+  --tw-prose-pre-bg: #f5f5f5;
 }
 
 .prose :where(h1, h2, h3):first-child {
