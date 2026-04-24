@@ -38,24 +38,25 @@ export function exportPdf(html: string, options: PdfOptions = {}) {
       <style>
         @page {
           size: A4;
-          margin: 25mm 20mm 25mm 20mm;
+          margin: 0;
         }
 
         * { box-sizing: border-box; }
+
+        html, body { margin: 0; padding: 0; }
 
         body {
           font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           font-size: 10.5pt;
           line-height: 1.8;
           color: #2c3e50;
-          padding: 0;
-          margin: 0;
           -webkit-font-smoothing: antialiased;
           word-break: keep-all;
           overflow-wrap: break-word;
         }
 
         .content {
+          padding: 25mm 20mm;
           max-width: 100%;
         }
 
